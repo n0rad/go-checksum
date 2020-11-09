@@ -1,4 +1,4 @@
-package hashsum
+package checksum
 
 import (
 	"encoding/hex"

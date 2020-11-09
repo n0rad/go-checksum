@@ -1,4 +1,4 @@
-package hashsum
+package checksum
 
 type Checksum struct {
 

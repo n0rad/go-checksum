@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/n0rad/go-hashsum"
+	"github.com/n0rad/go-checksum"
 	"log"
 	"os"
 )
@@ -12,7 +12,7 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "usage: checksum file ...\n")
 	fmt.Fprintln(os.Stderr, "supported checksums:")
 
-	for _, hash := range hashsum.Hashs {
+	for _, hash := range checksum.Hashs {
 		fmt.Fprint(os.Stderr, hash)
 		fmt.Fprint(os.Stderr, " ")
 	}
@@ -28,13 +28,13 @@ func main() {
 		usage()
 	}
 
-	h := hashsum.MakeHash(hashsum.Hash(flag.Arg(0)))
+	h := checksum.MakeHash(checksum.Hash(flag.Arg(0)))
 	if h == nil {
 		log.Fatalf("Unsupported checksum %q", flag.Arg(0))
 	}
 
 	if flag.NArg() < 2 {
-		filesum, err := hashsum.SumFilenameReader(h, os.Stdin, "-")
+		filesum, err := checksum.SumFilenameReader(h, os.Stdin, "-")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, os.Args[0], ": ", err)
 			os.Exit(1)
@@ -42,7 +42,7 @@ func main() {
 		fmt.Print(filesum)
 	} else {
 		for i := 1; i < flag.NArg(); i++ {
-			filesum, err := hashsum.SumFilename(h, flag.Arg(i))
+			filesum, err := checksum.SumFilename(h, flag.Arg(i))
 			if err != nil {
 				fmt.Fprintln(os.Stderr, os.Args[0], ": ", err)
 			}
