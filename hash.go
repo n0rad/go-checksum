@@ -18,8 +18,12 @@ import (
 	"hash/fnv"
 )
 
-func MakeHash(hashName Hash) hash.Hash {
-	switch hashName {
+func MakeHashString(hashName string) hash.Hash {
+	return MakeHash(Hash(hashName))
+}
+
+func MakeHash(hash Hash) hash.Hash {
+	switch hash {
 	case "blake2b-256":
 		new256, _ := blake2b.New256(nil)
 		return new256

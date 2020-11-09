@@ -28,19 +28,19 @@ func main() {
 		usage()
 	}
 
-	h := checksum.MakeHash(checksum.Hash(flag.Arg(0)))
+	h := checksum.MakeHashString(flag.Arg(0))
 	if h == nil {
 		log.Printf("Unsupported checksum %q", flag.Arg(0))
 		os.Exit(1)
 	}
 
 	if flag.NArg() < 2 {
-		filesum, err := checksum.SumFilenameReader(h, os.Stdin, "-")
+		fileSum, err := checksum.SumFilenameReader(h, os.Stdin, "-")
 		if err != nil {
 			println(os.Args[0], ": ", err)
 			os.Exit(1)
 		}
-		fmt.Print(filesum)
+		fmt.Print(fileSum)
 	} else {
 		for i := 1; i < flag.NArg(); i++ {
 			filesum, err := checksum.SumFilename(h, flag.Arg(i))
