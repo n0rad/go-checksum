@@ -1,8 +1,8 @@
 # go-checksum
 
-**go-checksum** is a go library to ease work with `hash` algorithm. 
+**go-checksum** is a go library to ease work with `hash` algorithms. 
 
-* Support plenty of algorithm
+* Support plenty of algorithms
 * Dynamic algorithm creation and usage
 * Ease hashing usage of `readers` and `files` 
 * Can create binaries like `sha*sum` with few lines of code
@@ -11,7 +11,7 @@
 * Validate files against detected checksum
 
 
-Supported algorithm : 
+Supported algorithms : 
 	**Blake2b-256** ,
 	**Blake2b-384**,
 	**Blake2b-512**,
