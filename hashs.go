@@ -75,11 +75,3 @@ var Hashs = []Hash{
 	Crc8,
 	Crc16_ccitt,
 }
-
-//func HashFromString(hash string) (Hash, error) {
-//	for _, h := range Hashs {
-//		if
-//		strings.ToLower(name)
-//	}
-//
-//}

@@ -9,14 +9,14 @@ import (
 )
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: checksum file ...\n")
-	fmt.Fprintln(os.Stderr, "supported checksums:")
+	println("usage: checksum file ...\n")
+	println("supported checksums:")
 
 	for _, hash := range checksum.Hashs {
-		fmt.Fprint(os.Stderr, hash)
-		fmt.Fprint(os.Stderr, " ")
+		println(hash)
+		println(" ")
 	}
-	fmt.Fprintln(os.Stderr)
+	println()
 	os.Exit(1)
 }
 
@@ -30,13 +30,14 @@ func main() {
 
 	h := checksum.MakeHash(checksum.Hash(flag.Arg(0)))
 	if h == nil {
-		log.Fatalf("Unsupported checksum %q", flag.Arg(0))
+		log.Printf("Unsupported checksum %q", flag.Arg(0))
+		os.Exit(1)
 	}
 
 	if flag.NArg() < 2 {
 		filesum, err := checksum.SumFilenameReader(h, os.Stdin, "-")
 		if err != nil {
-			fmt.Fprintln(os.Stderr, os.Args[0], ": ", err)
+			println(os.Args[0], ": ", err)
 			os.Exit(1)
 		}
 		fmt.Print(filesum)
@@ -44,7 +45,7 @@ func main() {
 		for i := 1; i < flag.NArg(); i++ {
 			filesum, err := checksum.SumFilename(h, flag.Arg(i))
 			if err != nil {
-				fmt.Fprintln(os.Stderr, os.Args[0], ": ", err)
+				println(os.Args[0], ": ", err)
 			}
 			fmt.Print(filesum)
 			h.Reset()
