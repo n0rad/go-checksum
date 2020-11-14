@@ -29,7 +29,7 @@ func main() {
 	}
 
 	if len(os.Args) < 3 {
-		fileSum, err := checksum.SumFilenameReader(h, os.Stdin, "-")
+		fileSum, err := checksum.SumLineFromReader(h, os.Stdin, "-")
 		if err != nil {
 			println(os.Args[0], ": ", err)
 			os.Exit(1)

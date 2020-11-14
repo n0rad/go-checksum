@@ -7,6 +7,20 @@ import (
 	"regexp"
 )
 
+type Directory struct {
+	fileRegexp *regexp.Regexp
+	inclusive  bool
+	strategy   Strategy
+}
+
+func (d Directory) Check(path string) {
+	directoryWalk(path, d.fileRegexp, d.inclusive, checkFunc(d.strategy))
+}
+
+func (d Directory) Set(path string) {
+	directoryWalk(path, d.fileRegexp, d.inclusive, setFunc(d.strategy))
+}
+
 func directoryWalk(path string, fileRegexp *regexp.Regexp, inclusive bool, f func(path string, info os.FileInfo)) error {
 	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -24,34 +38,45 @@ func directoryWalk(path string, fileRegexp *regexp.Regexp, inclusive bool, f fun
 	})
 }
 
-func CheckDir(path string, config IntegrityConfig) error {
-	return directoryWalk(path, config.regex, config.PatternIsInclusive, func(path string, info os.FileInfo) {
-		if SumFromFilename(config.hash, path) == "" {
+func checkFunc(s Strategy) func(path string, info os.FileInfo) {
+	return func(path string, info os.FileInfo) {
+		set, err := s.IsSet(path)
+		if err != nil {
+			logs.WithE(err).Error("Failed to check if sum is set")
+			return
+		}
+		if !set {
 			logs.WithField("path", path).Warn("Missing sum in filename")
 			return
 		}
 
-		ok, err := Check(config.hash, path)
+		ok, err := s.Check(path)
 		if err != nil {
 			logs.WithField("path", path).Error("Failed to check file integrity")
 		}
 		if !ok {
 			logs.WithField("path", path).Error("File integrity failed")
 		}
-	})
+	}
 }
 
-func AddDir(path string, config IntegrityConfig) error {
-	return directoryWalk(path, config.regex, config.PatternIsInclusive, func(path string, info os.FileInfo) {
-		if SumFromFilename(config.hash, path) == "" {
-			newName, err := Add(config.hash, path)
-			if err != nil {
-				logs.WithE(err).Error("Failed to Add sum to file")
+func setFunc(s Strategy) func(path string, info os.FileInfo) {
+	return func(path string, info os.FileInfo) {
+		set, err := s.IsSet(path)
+		if err != nil {
+			logs.WithE(err).Error("Failed to check if sum is set")
+			return
+		}
+
+		if !set {
+			logs.WithField("path", path).Info("Processing file")
+			if _, err := s.SumAndSet(path); err != nil {
+				logs.WithE(err).Error("Failed to set sum")
 				return
 			}
-			logs.WithField("path", path).WithField("name", filepath.Base(newName)).Warn("Added sum to filename")
+			logs.WithField("path", path).Info("Sum added")
 		} else {
-			logs.WithField("path", path).Warn("Sum already exists")
+			logs.WithField("path", path).Debug("Sum already exists")
 		}
-	})
+	}
 }

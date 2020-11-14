@@ -3,6 +3,7 @@ package integrity
 import (
 	"encoding/hex"
 	"github.com/n0rad/go-checksum/pkg/checksum"
+	"github.com/n0rad/go-erlog/data"
 	"github.com/n0rad/go-erlog/errs"
 	"hash"
 	"os"
@@ -10,100 +11,99 @@ import (
 	"strings"
 )
 
-
 type StrategyFilename struct {
-	NewHash hash.Hash
+	Hash    hash.Hash
 	OldHash hash.Hash
-
 }
 
-func TargetFileReplacingSum(oldHash hash.Hash, file string, newSum string) string {
+func (s StrategyFilename) Set(file string, sum string) error {
+	filename := s.newFilename(file, sum)
+	if err := os.Rename(file, filename); err != nil {
+		return errs.WithEF(err, data.WithField("new-file", filename), "Failed to rename file to set sum")
+	}
+	return nil
+}
+
+func (s StrategyFilename) SumAndSet(file string) (string, error) {
+	sum, err := checksum.SumFile(s.Hash, file)
+	if err != nil {
+		return "", err
+	}
+	return sum, s.Set(file, sum)
+}
+
+func (s StrategyFilename) GetSum(file string) (string, error) {
+	fileWithoutExt := strings.TrimSuffix(file, filepath.Ext(file))
+	hHexLen := s.Hash.Size() * 2
+	if len(filepath.Base(fileWithoutExt))-hHexLen <= 1 { // filename only contains CRC ?
+		return "", nil
+	}
+	if (fileWithoutExt[len(fileWithoutExt)-hHexLen-1]) != '-' { // crc do not start with a -
+		return "", nil
+	}
+	candidate := fileWithoutExt[len(fileWithoutExt)-hHexLen:]
+	_, err := hex.DecodeString(candidate) // not a crc
+	if err != nil {
+		return "", nil
+	}
+	return candidate, nil
+}
+
+func (s StrategyFilename) IsSet(file string) (bool, error) {
+	sum, err := s.GetSum(file)
+	if err != nil {
+		return false, err
+	}
+	if sum == "" {
+		return false, nil
+	}
+	return true, nil
+}
+
+func (s StrategyFilename) Sum(file string) (string, error) {
+	sum, err := checksum.SumFile(s.Hash, file)
+	if err != nil {
+		return "", errs.WithEF(err, data.WithField("file", file), "Failed to sum file")
+	}
+	return sum, nil
+}
+
+func (s StrategyFilename) Remove(file string) error {
+	return s.Set(file, "")
+}
+
+func (s StrategyFilename) Check(file string) (bool, error) {
+	sum, err := s.Sum(file)
+	if err != nil {
+		return false, err
+	}
+
+	savedSum, err := s.GetSum(file)
+	if savedSum != sum {
+		return false, nil
+	}
+	return true, nil
+}
+
+//////////////////////////////
+
+func (s StrategyFilename) newFilename(file string, newSum string) string {
 	if file == "" {
 		return ""
 	}
 
 	b := strings.Builder{}
 	pathBase := strings.TrimSuffix(file, filepath.Ext(file))
-	if SumFromFilename(oldHash, file) != "" {
-		b.WriteString(pathBase[:len(pathBase)-(oldHash.Size()*2)-1])
+	sum, _ := s.GetSum(file) // cannot return an error
+	if sum != "" {
+		b.WriteString(pathBase[:len(pathBase)-(s.OldHash.Size()*2)-1])
 	} else {
 		b.WriteString(pathBase)
 	}
-
-	b.WriteRune('-')
-	b.WriteString(newSum)
+	if newSum != "" {
+		b.WriteRune('-')
+		b.WriteString(newSum)
+	}
 	b.WriteString(filepath.Ext(file))
 	return b.String()
-}
-
-func SumFromFilename(hash hash.Hash, file string) string {
-	fileWithoutExt := strings.TrimSuffix(file, filepath.Ext(file))
-	hHexLen := hash.Size() * 2
-	if len(filepath.Base(fileWithoutExt))-hHexLen <= 1 { // filename only contains CRC ?
-		return ""
-	}
-	if (fileWithoutExt[len(fileWithoutExt)-hHexLen-1]) != '-' { // crc do not start with a -
-		return ""
-	}
-	candidate := fileWithoutExt[len(fileWithoutExt)-hHexLen:]
-	_, err := hex.DecodeString(candidate) // not a crc
-	if err != nil {
-		return ""
-	}
-	return candidate
-}
-
-//func ensureFilenameContainsHash(h hash.Hash, sumLen int, file string) error {
-//	if (SumFromFilename(file, h)) == "" {
-//		sum, err := SumFile(h, file)
-//		if err != nil {
-//			return err
-//		})
-//		if err := os.Rename(file, TargetFileReplacingSum(file, h, sum)); err != nil {
-//			return err
-//		}
-//	}
-//	return nil
-//}
-
-func Check(h hash.Hash, file string) (bool, error) {
-	sumFile, err := checksum.SumFile(h, file)
-	if err != nil {
-		return false, err
-	}
-
-	sum := SumFromFilename(h, file)
-	if sumFile != sum {
-		return false, nil
-	}
-	return true, nil
-}
-
-func Add(h hash.Hash, file string) (string, error) {
-	sum, err := checksum.SumFile(h, file)
-	if err != nil {
-		return file, errs.WithE(err, "Failed to create file sum")
-	}
-	newFile := TargetFileReplacingSum(h, file, sum)
-	if err := os.Rename(file, newFile); err != nil {
-		return file, err
-	}
-	return newFile, nil
-}
-
-func CheckOrAddIntegrityFilenameSum(h hash.Hash, file string) (bool, error) {
-	sumFile, err := checksum.SumFile(h, file)
-	if err != nil {
-		return false, err
-	}
-
-	sum := SumFromFilename(h, file)
-	if sum == "" {
-		if err := os.Rename(file, TargetFileReplacingSum(h, file, sumFile)); err != nil {
-			return false, err
-		}
-	} else if sumFile != sum {
-		return false, nil
-	}
-	return true, nil
 }

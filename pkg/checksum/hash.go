@@ -19,10 +19,10 @@ import (
 )
 
 func MakeHashString(hashName string) hash.Hash {
-	return MakeHash(Hash(hashName))
+	return NewHash(Hash(hashName))
 }
 
-func MakeHash(hash Hash) hash.Hash {
+func NewHash(hash Hash) hash.Hash {
 	switch hash {
 	case "blake2b-256":
 		new256, _ := blake2b.New256(nil)

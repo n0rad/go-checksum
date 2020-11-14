@@ -10,9 +10,7 @@ import (
 	"regexp"
 )
 
-var FIM IntegrityConfig
-
-type IntegrityConfig struct {
+type Config struct {
 	Pattern            string
 	PatternIsInclusive bool
 	Hash               string
@@ -22,7 +20,7 @@ type IntegrityConfig struct {
 	hash  hash.Hash
 }
 
-func (h *IntegrityConfig) Init() error {
+func (h *Config) Init() error {
 	if h.Pattern == "" {
 		h.Pattern = `(?i)\.*$`
 	}
@@ -40,7 +38,7 @@ func (h *IntegrityConfig) Init() error {
 	return nil
 }
 
-func (h *IntegrityConfig) Load(configPath string) error {
+func (h *Config) Load(configPath string) error {
 	bytes, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		return errs.WithEF(err, data.WithField("path", configPath), "Failed to read fim config file")

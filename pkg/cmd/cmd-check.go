@@ -7,7 +7,7 @@ import (
 
 func CheckCommand() *cobra.Command {
 	var configFile string
-	var config integrity.IntegrityConfig
+	var config integrity.Config
 
 	cmd := &cobra.Command{
 		Use:   "check",
