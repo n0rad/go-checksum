@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/n0rad/go-checksum"
+	"github.com/n0rad/go-checksum/pkg/checksum"
 	"os"
 )
 

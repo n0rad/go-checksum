@@ -16,4 +16,3 @@ func (d *Sum32) Write(b []byte) (int, error) {
 func (d Sum32) Sum(b []byte) []byte {
 	return append(b, byte(d&0xff), byte(d>>8), byte(d>>16), byte(d>>24))
 }
-

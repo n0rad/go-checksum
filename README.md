@@ -1,3 +1,8 @@
+# File Integrity Manager
+
+
+
+
 # go-checksum
 
 **go-checksum** is a go library to ease work with `hash` algorithms. 

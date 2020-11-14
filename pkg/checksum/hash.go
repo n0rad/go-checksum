@@ -5,7 +5,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
-	"github.com/n0rad/go-checksum/hashs"
+	"github.com/n0rad/go-checksum/pkg/hashs"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/blake2s"
 	"golang.org/x/crypto/md4"
@@ -103,7 +103,3 @@ func MakeHash(hash Hash) hash.Hash {
 	}
 	return nil
 }
-
-
-
-

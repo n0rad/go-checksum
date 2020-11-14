@@ -41,6 +41,7 @@ func SumFilenameReader(h hash.Hash, r io.Reader, filename string) (string, error
 
 // calculate sum of reader
 func SumReader(h hash.Hash, r io.Reader) (string, error) {
+	h.Reset()
 	_, err := io.Copy(h, r)
 	if err != nil {
 		return "", err
