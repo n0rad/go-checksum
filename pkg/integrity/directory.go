@@ -13,6 +13,12 @@ type Directory struct {
 	Strategy  Strategy
 }
 
+func (d Directory) List(path string) error {
+	return d.directoryWalk(path, func(path string, info os.FileInfo) {
+		println(path)
+	})
+}
+
 func (d Directory) Check(path string) error {
 	return d.directoryWalk(path, func(path string, info os.FileInfo) {
 		set, err := d.Strategy.IsSet(path)

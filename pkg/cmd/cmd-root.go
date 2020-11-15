@@ -7,20 +7,6 @@ import (
 	"os"
 )
 
-// -h hash algorism
-// --dry-run
-// -L log level
-// -p pattern
-//
-
-// pattern test
-// create		// create sum on file missing
-// check		// check integrity for file with sum
-// run         	// create sum if missing, validate if exists
-// agent		// like run but with an agent watching files and periodicly check
-// hash replace // replace
-//
-
 func RootCmd() *cobra.Command {
 	var logLevel string
 	cmd := &cobra.Command{
@@ -41,7 +27,7 @@ func RootCmd() *cobra.Command {
 	cmd.AddCommand(
 		RemoveCommand(),
 		CheckCommand(),
-		PatternCommand(),
+		ListCommand(),
 		SetCommand(),
 	)
 
