@@ -50,7 +50,7 @@ func SumLine(filename string, sum string) string {
 
 func SumFromSumSfvLine(line string) string {
 	split := strings.Split(line, " ")
-	return split[len(split)-1]
+	return strings.TrimSpace(split[len(split)-1])
 }
 
 func SumFromSumLine(line string) string {

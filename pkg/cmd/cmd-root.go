@@ -4,6 +4,7 @@ import (
 	"github.com/n0rad/go-erlog/logs"
 	_ "github.com/n0rad/go-erlog/register"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // -h hash algorism
@@ -23,6 +24,7 @@ import (
 func RootCmd() *cobra.Command {
 	var logLevel string
 	cmd := &cobra.Command{
+		Use:           os.Args[0],
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
@@ -37,9 +39,10 @@ func RootCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(
+		RemoveCommand(),
 		CheckCommand(),
 		PatternCommand(),
-		AddCommand(),
+		SetCommand(),
 	)
 
 	cmd.PersistentFlags().StringVarP(&logLevel, "log-level", "L", "", "Set log level")

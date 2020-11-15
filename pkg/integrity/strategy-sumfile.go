@@ -7,11 +7,19 @@ import (
 	"hash"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 type StrategySumFile struct {
 	Hash     hash.Hash
 	HashName string
+}
+
+func (s StrategySumFile) IsSumFile(file string) bool {
+	if filepath.Ext(file) == s.sumFileSuffix() {
+		return true
+	}
+	return false
 }
 
 func (s StrategySumFile) IsSet(file string) (bool, error) {
@@ -61,9 +69,9 @@ func (s StrategySumFile) Set(file string, sum string) error {
 
 	var line string
 	if s.HashName == string(checksum.Crc32_ieee) {
-		line = checksum.SumSfvLine(file, sum)
+		line = checksum.SumSfvLine(filepath.Base(file), sum)
 	} else {
-		line = checksum.SumLine(file, sum)
+		line = checksum.SumLine(filepath.Base(file), sum)
 	}
 
 	sumFilename := s.sumFilename(file)
@@ -75,30 +83,41 @@ func (s StrategySumFile) Set(file string, sum string) error {
 
 func (s StrategySumFile) Remove(file string) error {
 	sumFilename := s.sumFilename(file)
-	if err := os.Remove(sumFilename); err != nil {
-		return errs.WithEF(err, data.WithField("file", sumFilename), "Failed to remove sum file")
+	if _, err := os.Stat(sumFilename); err == nil {
+		if err := os.Remove(sumFilename); err != nil {
+			return errs.WithEF(err, data.WithField("file", sumFilename), "Failed to remove sum file")
+		}
+	} else if !os.IsNotExist(err) {
+		return errs.WithF(data.WithField("file", sumFilename), "Failed to stat sum file")
 	}
 	return nil
 }
 
-func (s StrategySumFile) Check(file string) (bool, error) {
+func (s StrategySumFile) Check(file string) (error, error) {
 	sum, err := s.Sum(file)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	savedSum, err := s.GetSum(file)
-	if savedSum != sum {
-		return false, nil
+	if err != nil {
+		return nil, errs.WithE(err, "Failed to get saved sum")
 	}
-	return true, nil
+	if savedSum != sum {
+		return errs.WithF(data.WithField("sum", sum).WithField("saved-sum", savedSum), "sums do not match"), nil
+	}
+	return nil, nil
 }
 
 ////////////////////////////////////////
 
 func (s StrategySumFile) sumFilename(file string) string {
+	return file + s.sumFileSuffix()
+}
+
+func (s StrategySumFile) sumFileSuffix() string {
 	if s.HashName == string(checksum.Crc32_ieee) {
-		return file + ".sfv"
+		return ".sfv"
 	}
-	return file + "." + s.HashName
+	return "." + s.HashName
 }

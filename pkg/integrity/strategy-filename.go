@@ -16,6 +16,10 @@ type StrategyFilename struct {
 	OldHash hash.Hash
 }
 
+func (s StrategyFilename) IsSumFile(file string) bool {
+	return false
+}
+
 func (s StrategyFilename) Set(file string, sum string) error {
 	filename := s.newFilename(file, sum)
 	if err := os.Rename(file, filename); err != nil {
@@ -72,17 +76,20 @@ func (s StrategyFilename) Remove(file string) error {
 	return s.Set(file, "")
 }
 
-func (s StrategyFilename) Check(file string) (bool, error) {
+func (s StrategyFilename) Check(file string) (error, error) {
 	sum, err := s.Sum(file)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	savedSum, err := s.GetSum(file)
-	if savedSum != sum {
-		return false, nil
+	if err != nil {
+		return nil, errs.WithE(err, "Failed to get saved sum")
 	}
-	return true, nil
+	if savedSum != sum {
+		return errs.WithF(data.WithField("sum", sum).WithField("saved-sum", savedSum), "sums do not match"), nil
+	}
+	return nil, nil
 }
 
 //////////////////////////////

@@ -5,13 +5,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func AddCommand() *cobra.Command {
+func SetCommand() *cobra.Command {
 	var configFile string
-	var config integrity.Config
+	var config Config
 
 	cmd := &cobra.Command{
-		Use:   "add",
-		Short: "Add integrity to filenames",
+		Use:   "set",
+		Short: "Set integrity",
 		Args:  cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if configFile != "" {
@@ -21,7 +21,13 @@ func AddCommand() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
-				if err := integrity.AddDir(arg, config); err != nil {
+				directory := integrity.Directory{
+					Regex:     config.regex,
+					Inclusive: config.PatternIsInclusive,
+					Strategy:  integrity.NewSumFileStrategy(config.Hash),
+				}
+
+				if err := directory.Set(arg); err != nil {
 					return err
 				}
 			}

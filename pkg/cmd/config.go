@@ -1,11 +1,10 @@
-package integrity
+package cmd
 
 import (
 	"github.com/ghodss/yaml"
 	"github.com/n0rad/go-checksum/pkg/checksum"
 	"github.com/n0rad/go-erlog/data"
 	"github.com/n0rad/go-erlog/errs"
-	"hash"
 	"io/ioutil"
 	"regexp"
 )
@@ -13,11 +12,10 @@ import (
 type Config struct {
 	Pattern            string
 	PatternIsInclusive bool
-	Hash               string
+	Hash               checksum.Hash
 	Strategy           string
 
 	regex *regexp.Regexp
-	hash  hash.Hash
 }
 
 func (h *Config) Init() error {
@@ -28,13 +26,9 @@ func (h *Config) Init() error {
 	var err error
 	h.regex, err = regexp.Compile(h.Pattern)
 	if err != nil {
-		return errs.WithEF(err, data.WithField("regex", h.regex), "Failed to compile files regex")
+		return errs.WithEF(err, data.WithField("Regex", h.regex), "Failed to compile files Regex")
 	}
 
-	h.hash = checksum.MakeHashString(h.Hash)
-	if h.hash == nil {
-		return errs.WithF(data.WithField("hash", h.Hash), "Unknown hash algorithm")
-	}
 	return nil
 }
 

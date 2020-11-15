@@ -1,3 +1,3 @@
-Pattern: (?i)\.*$
-PatternIsInclusive: true
-Hash: crc32-ieee
+pattern: (?i)\.*$
+patternIsInclusive: true
+hash: crc32-ieee

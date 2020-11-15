@@ -12,7 +12,7 @@ require (
 	github.com/n0rad/go-erlog v0.0.0-20190510152055-0a033e8086d8
 	github.com/n0rad/gomake v0.0.0-20201111222446-6e37199d9308
 	github.com/spf13/cobra v1.1.1
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.6.1 // indirect
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
 	golang.org/x/sys v0.0.0-20201110211018-35f3e6cf4a65 // indirect
 	golang.org/x/tools v0.0.0-20201111213328-5794f8bd7a57 // indirect

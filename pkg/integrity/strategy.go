@@ -9,7 +9,8 @@ type Strategy interface {
 	SumAndSet(file string) (string, error) // TODO generic
 	Set(file string, sum string) error
 	Remove(file string) error
-	Check(file string) (bool, error) // TODO generic
+	Check(file string) (error, error) // TODO generic
+	IsSumFile(file string) bool
 }
 
 func NewSumFileStrategy(hash checksum.Hash) StrategySumFile {

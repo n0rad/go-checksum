@@ -5,16 +5,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CheckCommand() *cobra.Command {
+func RemoveCommand() *cobra.Command {
 	var configFile string
 	var config Config
 
 	cmd := &cobra.Command{
-		Use:   "check",
-		Short: "check integrity of files",
+		Use:   "remove",
+		Short: "Add integrity to filenames",
 		Args:  cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return config.Load(configFile)
+			if configFile != "" {
+				return config.Load(configFile)
+			}
+			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
@@ -24,7 +27,7 @@ func CheckCommand() *cobra.Command {
 					Strategy:  integrity.NewSumFileStrategy(config.Hash),
 				}
 
-				if err := directory.Check(arg); err != nil {
+				if err := directory.Remove(arg); err != nil {
 					return err
 				}
 			}
@@ -32,8 +35,7 @@ func CheckCommand() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&configFile, "config", "c", `./fim.yaml`, "integrity configuration file")
-	//cmd.MarkFlagRequired("config")
+	cmd.Flags().StringVarP(&configFile, "config", "c", "", "integrity configuration file")
 
 	return cmd
 }
