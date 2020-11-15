@@ -88,8 +88,10 @@ func (d Directory) directoryWalk(path string, f func(path string, info os.FileIn
 		if info.IsDir() {
 			return nil
 		}
+
 		if d.Inclusive && d.Regex.MatchString(path) ||
 			!d.Inclusive && !d.Regex.MatchString(path) {
+			logs.WithField("path", path).Debug("Processing file")
 			f(path, info)
 		}
 		return nil

@@ -1,4 +1,5 @@
 #pattern: (?i)\.*$
 pattern: (?i)\.(jpg|lock)$
 patternIsInclusive: true
-hash: crc32-ieee
+#hash: crc32-ieee
+hash: sha1
