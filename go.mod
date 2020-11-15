@@ -4,6 +4,8 @@ go 1.15
 
 require (
 	dmitri.shuralyov.com/go/generated v0.0.0-20170818220700-b1254a446363 // indirect
+	github.com/bep/debounce v1.2.0
+	github.com/fsnotify/fsnotify v1.4.7
 	github.com/fzipp/gocyclo v0.3.1 // indirect
 	github.com/ghodss/yaml v1.0.0
 	github.com/gordonklaus/ineffassign v0.0.0-20201107091007-3b93a8888063 // indirect

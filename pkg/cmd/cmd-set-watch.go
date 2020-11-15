@@ -5,13 +5,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func SetCommand() *cobra.Command {
+func setWatchCommand() *cobra.Command {
 	var configFile string
 	var config Config
 
 	cmd := &cobra.Command{
-		Use:   "set",
-		Short: "Set integrity",
+		Use:   "watch",
+		Short: "Watch new file to add sum",
 		Args:  cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if configFile != "" {
@@ -27,7 +27,7 @@ func SetCommand() *cobra.Command {
 					Strategy:  integrity.NewSumFileStrategy(config.Hash),
 				}
 
-				if err := directory.Set(arg); err != nil {
+				if err := directory.Watch(arg); err != nil {
 					return err
 				}
 			}
@@ -35,8 +35,7 @@ func SetCommand() *cobra.Command {
 		},
 	}
 
-	cmd.AddCommand(setWatchCommand())
-
+	// TODO move to root, along with others
 	cmd.Flags().StringVarP(&configFile, "config", "c", "", "integrity configuration file")
 
 	return cmd
