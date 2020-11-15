@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/n0rad/go-checksum/pkg/integrity"
 	"github.com/n0rad/go-erlog/logs"
 	_ "github.com/n0rad/go-erlog/register"
 	"github.com/spf13/cobra"
@@ -43,4 +44,14 @@ func RootCmd() *cobra.Command {
 	cmd.MarkFlagRequired("config")
 
 	return cmd
+}
+
+func runCmdForPath(config *Config, path string, f func(d integrity.Directory) func(path string) error) error {
+	directory := integrity.Directory{
+		Regex:     config.regex,
+		Inclusive: config.PatternIsInclusive,
+		Strategy:  integrity.NewStrategy(config.Strategy, config.Hash),
+	}
+
+	return f(directory)(path)
 }

@@ -13,16 +13,18 @@ type Strategy interface {
 	IsSumFile(file string) bool
 }
 
-func NewSumFileStrategy(hash checksum.Hash) StrategySumFile {
-	return StrategySumFile{
-		Hash:     checksum.NewHash(hash),
-		HashName: string(hash),
+func NewStrategy(strategyName string, hash checksum.Hash) Strategy {
+	switch strategyName {
+	case "sumfile":
+		return StrategySumFile{
+			Hash:     checksum.NewHash(hash),
+			HashName: string(hash),
+		}
+	case "filename":
+		return StrategyFilename{
+			Hash:    checksum.NewHash(hash),
+			OldHash: checksum.NewHash(hash), // support old HASH
+		}
 	}
-}
-
-func NewFilenameStrategy(hash checksum.Hash, oldHash checksum.Hash) StrategyFilename {
-	return StrategyFilename{
-		Hash:    checksum.NewHash(hash),
-		OldHash: checksum.NewHash(oldHash),
-	}
+	return nil
 }

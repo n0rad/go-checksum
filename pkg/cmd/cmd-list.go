@@ -17,13 +17,10 @@ func ListCommand(config *Config) *cobra.Command {
 				if reverse {
 					inclusive = !inclusive
 				}
-				directory := integrity.Directory{
-					Regex:     config.regex,
-					Inclusive: inclusive,
-					Strategy:  integrity.NewSumFileStrategy(config.Hash),
-				}
-
-				if err := directory.List(arg); err != nil {
+				if err := runCmdForPath(config, arg, func(d integrity.Directory) func(path string) error {
+					d.Inclusive = inclusive
+					return d.List
+				}); err != nil {
 					return err
 				}
 			}
@@ -32,6 +29,5 @@ func ListCommand(config *Config) *cobra.Command {
 	}
 
 	cmd.Flags().BoolVarP(&reverse, "reverse", "r", false, "Reverse regex match")
-
 	return cmd
 }

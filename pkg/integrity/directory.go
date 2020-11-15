@@ -21,6 +21,8 @@ type Directory struct {
 	timersMutex *sync.Mutex
 }
 
+type DirectoryAction func(p []byte) (n int, err error)
+
 func (d Directory) List(path string) error {
 	return d.directoryWalk(path, func(path string, info os.FileInfo) {
 		println(path)

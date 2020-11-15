@@ -12,13 +12,9 @@ func CheckCommand(config *Config) *cobra.Command {
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
-				directory := integrity.Directory{
-					Regex:     config.regex,
-					Inclusive: config.PatternIsInclusive,
-					Strategy:  integrity.NewSumFileStrategy(config.Hash),
-				}
-
-				if err := directory.Check(arg); err != nil {
+				if err := runCmdForPath(config, arg, func(d integrity.Directory) func(path string) error {
+					return d.Check
+				}); err != nil {
 					return err
 				}
 			}
