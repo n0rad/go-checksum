@@ -5,20 +5,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func SetCommand() *cobra.Command {
-	var configFile string
-	var config Config
-
+func SetCommand(config *Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set",
 		Short: "Set integrity",
 		Args:  cobra.MinimumNArgs(1),
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if configFile != "" {
-				return config.Load(configFile)
-			}
-			return nil
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
 				directory := integrity.Directory{
@@ -34,10 +25,6 @@ func SetCommand() *cobra.Command {
 			return nil
 		},
 	}
-
-	cmd.AddCommand(setWatchCommand())
-
-	cmd.Flags().StringVarP(&configFile, "config", "c", "", "integrity configuration file")
-
+	cmd.AddCommand(setWatchCommand(config))
 	return cmd
 }

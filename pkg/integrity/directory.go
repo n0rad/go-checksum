@@ -39,6 +39,7 @@ func (d Directory) Check(path string) error {
 			return
 		}
 
+		logs.WithField("path", path).Info("Processing file")
 		ok, err := d.Strategy.Check(path)
 		if err != nil {
 			logs.WithField("path", path).Error("Failed to check file integrity")
