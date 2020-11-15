@@ -119,6 +119,9 @@ func (d Directory) Watch(path string) error {
 
 func (d Directory) processEvent(event fsnotify.Event, watcher *fsnotify.Watcher) error {
 	logs.WithField("event", event).Trace("received fs event")
+	if !d.matchesPattern(event.Name) {
+		return nil
+	}
 	if d.Strategy.IsSumFile(event.Name) {
 		return nil
 	}
@@ -134,6 +137,7 @@ func (d Directory) processEvent(event fsnotify.Event, watcher *fsnotify.Watcher)
 				return errs.WithE(err, "Failed to watch directory")
 			}
 		} else {
+			logs.WithField("file", event.Name).Info("Calculate sum of new file")
 			if _, err := d.Strategy.SumAndSet(event.Name); err != nil {
 				return errs.WithE(err, "Failed to sum new file")
 			}
@@ -144,7 +148,7 @@ func (d Directory) processEvent(event fsnotify.Event, watcher *fsnotify.Watcher)
 			timer.Stop()
 		}
 		d.timers[event.Name] = time.AfterFunc(1*time.Second, func() {
-			logs.WithField("file", event.Name).Debug("Recalculate sum after write")
+			logs.WithField("file", event.Name).Info("Recalculate sum after write")
 			if _, err := d.Strategy.SumAndSet(event.Name); err != nil {
 				logs.WithE(err).Error("Failed to sum new file")
 			}
@@ -155,11 +159,15 @@ func (d Directory) processEvent(event fsnotify.Event, watcher *fsnotify.Watcher)
 		})
 		d.timersMutex.Unlock()
 	case fsnotify.Remove:
+		logs.WithField("file", event.Name).Info("Removing sum of deleted file")
 		if err := d.Strategy.Remove(event.Name); err != nil {
 			return errs.WithE(err, "Failed to remove sum file")
 		}
 	case fsnotify.Rename:
-
+		logs.WithField("file", event.Name).Info("Removing sum of renamed file")
+		if err := d.Strategy.Remove(event.Name); err != nil {
+			return errs.WithE(err, "Failed to remove sum file")
+		}
 	case fsnotify.Chmod:
 	}
 
@@ -182,11 +190,15 @@ func (d Directory) directoryWalk(path string, f func(path string, info os.FileIn
 			return nil
 		}
 
-		if d.Inclusive && d.Regex.MatchString(path) ||
-			!d.Inclusive && !d.Regex.MatchString(path) {
+		if d.matchesPattern(path) {
 			logs.WithField("path", path).Debug("Processing file")
 			f(path, info)
 		}
 		return nil
 	})
+}
+
+func (d Directory) matchesPattern(path string) bool {
+	return d.Inclusive && d.Regex.MatchString(path) ||
+		!d.Inclusive && !d.Regex.MatchString(path)
 }
