@@ -35,7 +35,7 @@ fi sum -H sha1 testfile.txt
 
 
 # list files that will be hashed and checked
-fi -c ./fi.yaml list test/
+fi -c ./checksum.yaml list test/
 # set sum to filesum or filename
 fi set test/
 # watch for new files in the tree and set sum
