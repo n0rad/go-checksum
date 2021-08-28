@@ -8,16 +8,12 @@ import (
 
 func main() {
 	gomake.ProjectBuilder().
-		WithName("fim").
+		WithName("checksum").
 		WithStep(&gomake.StepBuild{
 			Programs: []gomake.Program{
 				{
-					BinaryName: "fim",
-					Package:    "github.com/n0rad/go-checksum/pkg/cli/fim",
-				},
-				{
-					BinaryName: "filesum",
-					Package:    "github.com/n0rad/go-checksum/pkg/cli/filesum",
+					BinaryName: "checksum",
+					Package:    "github.com/n0rad/go-checksum/pkg/cli",
 				},
 			},
 		}).

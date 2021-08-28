@@ -62,7 +62,7 @@ func NewHash(hash Hash) hash.Hash {
 		return sha512.New512_224()
 	case "sha512-256":
 		return sha512.New512_256()
-	case "crc32-ieee":
+	case "crc32-ieee", "crc32":
 		return crc32.NewIEEE()
 	case "crc64-iso":
 		return crc64.New(crc64.MakeTable(crc64.ISO))
@@ -96,7 +96,7 @@ func NewHash(hash Hash) hash.Hash {
 		return new(hashs.Sum64)
 	case "crc8":
 		return new(hashs.Crc8)
-	case "crc16-ccitt":
+	case "crc16-ccitt", "crc16":
 		c := new(hashs.Crc16ccitt)
 		c.Reset()
 		return c

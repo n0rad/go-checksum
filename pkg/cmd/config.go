@@ -23,10 +23,14 @@ func (h *Config) Init() error {
 		h.Pattern = `(?i)\.*$`
 	}
 
+	if h.Hash == "" {
+		h.Hash = checksum.Sha1
+	}
+
 	var err error
 	h.regex, err = regexp.Compile(h.Pattern)
 	if err != nil {
-		return errs.WithEF(err, data.WithField("Regex", h.regex), "Failed to compile files Regex")
+		return errs.WithEF(err, data.WithField("regex", h.regex), "Failed to compile files regex")
 	}
 
 	return nil
@@ -35,15 +39,15 @@ func (h *Config) Init() error {
 func (h *Config) Load(configPath string) error {
 	bytes, err := ioutil.ReadFile(configPath)
 	if err != nil {
-		return errs.WithEF(err, data.WithField("path", configPath), "Failed to read fim config file")
+		return errs.WithEF(err, data.WithField("path", configPath), "Failed to read config file")
 	}
 
 	if err := yaml.Unmarshal(bytes, h); err != nil {
-		return errs.WithEF(err, data.WithField("content", string(bytes)).WithField("path", configPath), "Failed to parse fim file")
+		return errs.WithEF(err, data.WithField("content", string(bytes)).WithField("path", configPath), "Failed to parse config file")
 	}
 
 	if err := h.Init(); err != nil {
-		return errs.WithEF(err, data.WithField("content", string(bytes)), "Failed to init hdm file")
+		return errs.WithEF(err, data.WithField("content", string(bytes)), "Failed to init config")
 	}
 	return nil
 }

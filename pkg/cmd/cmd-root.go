@@ -18,6 +18,9 @@ func RootCmd() *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if cmd.Use == "sum" {
+				return nil
+			}
 			return config.Load(configFile)
 		},
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
@@ -36,9 +39,10 @@ func RootCmd() *cobra.Command {
 		CheckCommand(config),
 		ListCommand(config),
 		SetCommand(config),
+		SumCommand(),
 	)
 
-	cmd.PersistentFlags().StringVarP(&configFile, "config", "c", `./fim.yaml`, "configuration file")
+	cmd.PersistentFlags().StringVarP(&configFile, "config", "c", "./checksum.yaml", "configuration file")
 	cmd.PersistentFlags().StringVarP(&logLevel, "log-level", "L", "", "Set log level")
 
 	cmd.MarkFlagRequired("config")
