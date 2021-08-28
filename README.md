@@ -11,7 +11,7 @@ As lib :
 - Detect checksum files 
 - Validate files against detected checksum
 
-+ As a binary :
+As a binary :
 - mimic `sha1sum` but for all algo
 - process directory trees to 
   - `set` sum in a **sumfile** or in the **filename**
