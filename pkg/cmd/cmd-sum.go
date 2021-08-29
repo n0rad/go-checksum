@@ -29,17 +29,17 @@ func SumCommand() *cobra.Command {
 				}
 				fmt.Print(fileSum)
 			} else {
-				for i := 2; i < len(os.Args); i++ {
-					stat, err := os.Stat(os.Args[i])
+				for i := 0; i < len(args); i++ {
+					stat, err := os.Stat(args[i])
 					if err != nil {
-						println(os.Args[0], ": ", os.Args[i], ": ", "No such file or directory")
+						println(os.Args[0], ": ", args[i], ": ", "No such file or directory")
 						continue
 					}
 					if stat.IsDir() {
-						println(os.Args[0], ": ", os.Args[i], ": ", "Is a directory")
+						println(os.Args[0], ": ", args[i], ": ", "Is a directory")
 						continue
 					}
-					fileSum, err := checksum.SumFilename(h, os.Args[i])
+					fileSum, err := checksum.SumFilename(h, args[i])
 					if err != nil {
 						println(os.Args[0], ": ", err.Error())
 					}
