@@ -3,7 +3,6 @@ package cmd
 import (
 	"github.com/n0rad/go-checksum/pkg/integrity"
 	"github.com/n0rad/go-erlog/logs"
-	_ "github.com/n0rad/go-erlog/register"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -18,12 +17,6 @@ func RootCmd() *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			if cmd.Use == "sum" {
-				return nil
-			}
-			return config.Load(configFile)
-		},
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			if logLevel != "" {
 				level, err := logs.ParseLevel(logLevel)
 				if err != nil {
@@ -31,6 +24,11 @@ func RootCmd() *cobra.Command {
 				}
 				logs.SetLevel(level)
 			}
+
+			if cmd.Use == "sum" {
+				return nil
+			}
+			return config.Load(configFile)
 		},
 	}
 

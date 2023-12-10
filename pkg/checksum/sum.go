@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// calculate sum of file, with filename, as checksum
+// SumFilename compute sum of file, with filename, as checksum
 func SumFilename(h hash.Hash, file string) (string, error) {
 	f, err := os.Open(file)
 	if err != nil {
@@ -20,7 +20,7 @@ func SumFilename(h hash.Hash, file string) (string, error) {
 	return SumLineFromReader(h, f, file)
 }
 
-// calculate sum of file
+// SumFile compute sum of file
 func SumFile(h hash.Hash, file string) (string, error) {
 	f, err := os.Open(file)
 	if err != nil {
@@ -31,7 +31,7 @@ func SumFile(h hash.Hash, file string) (string, error) {
 	return SumReader(h, f)
 }
 
-// calculate sum of reader
+// SumLineFromReader compute sum of reader
 func SumLineFromReader(h hash.Hash, r io.Reader, filename string) (string, error) {
 	sum, err := SumReader(h, r)
 	if err != nil {
@@ -57,7 +57,7 @@ func SumFromSumLine(line string) string {
 	return strings.Split(line, " ")[0]
 }
 
-// calculate sum of reader
+// SumReader compute sum of reader
 func SumReader(h hash.Hash, r io.Reader) (string, error) {
 	h.Reset()
 	_, err := io.Copy(h, r)

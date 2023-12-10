@@ -40,9 +40,8 @@ func (s StrategySumFile) GetSum(file string) (string, error) {
 	}
 	if s.HashName == string(checksum.Crc32_ieee) {
 		return checksum.SumFromSumSfvLine(string(readFile)), nil
-	} else {
-		return checksum.SumFromSumLine(string(readFile)), nil
 	}
+	return checksum.SumFromSumLine(string(readFile)), nil
 }
 
 func (s StrategySumFile) Sum(file string) (string, error) {

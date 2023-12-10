@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/n0rad/go-checksum/pkg/cmd"
 	"github.com/n0rad/go-erlog/logs"
+	_ "github.com/n0rad/go-erlog/register"
 	"math/rand"
 	"os"
 	"syscall"
