@@ -17,7 +17,7 @@ func ListCommand(config *Config) *cobra.Command {
 				if reverse {
 					inclusive = !inclusive
 				}
-				if err := runCmdForPath(config, arg, func(d integrity.Directory) func(path string) error {
+				if err := runCmdForPath(config, arg, func(d integrity.Path) func(path string) error {
 					d.Inclusive = inclusive
 					return d.List
 				}); err != nil {

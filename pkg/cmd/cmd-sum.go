@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/n0rad/go-checksum/pkg/checksum"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func SumCommand() *cobra.Command {
@@ -50,6 +51,6 @@ func SumCommand() *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().StringVarP(&hash, "hash", "H", "sha1", "Hash")
+	cmd.Flags().StringVarP(&hash, "hash", "H", "sha256", "Hash")
 	return cmd
 }

@@ -12,7 +12,7 @@ func CheckCommand(config *Config) *cobra.Command {
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
-				if err := runCmdForPath(config, arg, func(d integrity.Directory) func(path string) error {
+				if err := runCmdForPath(config, arg, func(d integrity.Path) func(path string) error {
 					return d.Check
 				}); err != nil {
 					return err

@@ -80,7 +80,7 @@ func (s StrategySumFile) Set(file string, sum string) error {
 	return nil
 }
 
-func (s StrategySumFile) Remove(file string) error {
+func (s StrategySumFile) Unset(file string) error {
 	sumFilename := s.sumFilename(file)
 	if _, err := os.Stat(sumFilename); err == nil {
 		if err := os.Remove(sumFilename); err != nil {

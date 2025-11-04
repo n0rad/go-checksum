@@ -2,17 +2,18 @@ package integrity
 
 import (
 	"fmt"
-	"github.com/fsnotify/fsnotify"
-	"github.com/n0rad/go-erlog/errs"
-	"github.com/n0rad/go-erlog/logs"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sync"
 	"time"
+
+	"github.com/fsnotify/fsnotify"
+	"github.com/n0rad/go-erlog/errs"
+	"github.com/n0rad/go-erlog/logs"
 )
 
-type Directory struct {
+type Path struct {
 	Regex     *regexp.Regexp
 	Inclusive bool
 	Strategy  Strategy
@@ -23,13 +24,13 @@ type Directory struct {
 
 type DirectoryAction func(p []byte) (n int, err error)
 
-func (d Directory) List(path string) error {
+func (d Path) List(path string) error {
 	return d.directoryWalk(path, func(path string, info os.FileInfo) {
-		println(path)
+		fmt.Println(path)
 	})
 }
 
-func (d Directory) Check(path string) error {
+func (d Path) Check(path string) error {
 	return d.directoryWalk(path, func(path string, info os.FileInfo) {
 		set, err := d.Strategy.IsSet(path)
 		if err != nil {
@@ -52,7 +53,7 @@ func (d Directory) Check(path string) error {
 	})
 }
 
-func (d Directory) Set(path string) error {
+func (d Path) Set(path string) error {
 	return d.directoryWalk(path, func(path string, info os.FileInfo) {
 		if d.Strategy.IsSumFile(path) {
 			return
@@ -76,15 +77,15 @@ func (d Directory) Set(path string) error {
 	})
 }
 
-func (d Directory) Remove(path string) error {
+func (d Path) Unset(path string) error {
 	return d.directoryWalk(path, func(path string, info os.FileInfo) {
-		if err := d.Strategy.Remove(path); err != nil {
-			logs.WithE(err).WithField("path", path).Error("Failed to remove integrity")
+		if err := d.Strategy.Unset(path); err != nil {
+			logs.WithE(err).WithField("path", path).Error("Failed to unset integrity")
 		}
 	})
 }
 
-func (d Directory) Watch(path string) error {
+func (d Path) Watch(path string) error {
 	d.timers = map[string]*time.Timer{}
 	d.timersMutex = &sync.Mutex{}
 
@@ -120,7 +121,7 @@ func (d Directory) Watch(path string) error {
 	return nil
 }
 
-func (d Directory) processEvent(event fsnotify.Event, watcher *fsnotify.Watcher) error {
+func (d Path) processEvent(event fsnotify.Event, watcher *fsnotify.Watcher) error {
 	logs.WithField("event", event).Trace("received fs event")
 	if !d.matchesPattern(event.Name) {
 		return nil
@@ -163,12 +164,12 @@ func (d Directory) processEvent(event fsnotify.Event, watcher *fsnotify.Watcher)
 		d.timersMutex.Unlock()
 	case fsnotify.Remove:
 		logs.WithField("file", event.Name).Info("Removing sum of deleted file")
-		if err := d.Strategy.Remove(event.Name); err != nil {
+		if err := d.Strategy.Unset(event.Name); err != nil {
 			return errs.WithE(err, "Failed to remove sum file")
 		}
 	case fsnotify.Rename:
 		logs.WithField("file", event.Name).Info("Removing sum of renamed file")
-		if err := d.Strategy.Remove(event.Name); err != nil {
+		if err := d.Strategy.Unset(event.Name); err != nil {
 			return errs.WithE(err, "Failed to remove sum file")
 		}
 	case fsnotify.Chmod:
@@ -179,29 +180,36 @@ func (d Directory) processEvent(event fsnotify.Event, watcher *fsnotify.Watcher)
 
 ////////////////////
 
-func (d Directory) directoryWalk(path string, f func(path string, info os.FileInfo)) error {
-	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-		if d.Strategy.IsSumFile(path) {
-			return nil
-		}
+func (d Path) directoryWalk(path string, f func(path string, info os.FileInfo)) error {
+	if stat, err := os.Stat(path); err != nil {
+		return err
+	} else if stat.IsDir() {
+		return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+			if d.Strategy.IsSumFile(path) {
+				return nil
+			}
 
-		if err != nil {
-			logs.WithE(err).WithField("path", path).Error("Failed to process path")
-			return nil
-		}
-		if info.IsDir() {
-			return nil
-		}
+			if err != nil {
+				logs.WithE(err).WithField("path", path).Error("Failed to process path")
+				return nil
+			}
+			if info.IsDir() {
+				return nil
+			}
 
-		if d.matchesPattern(path) {
-			logs.WithField("path", path).Debug("Processing file")
-			f(path, info)
-		}
-		return nil
-	})
+			if d.matchesPattern(path) {
+				logs.WithField("path", path).Debug("Processing file")
+				f(path, info)
+			}
+			return nil
+		})
+	} else {
+		f(path, stat)
+	}
+	return nil
 }
 
-func (d Directory) matchesPattern(path string) bool {
+func (d Path) matchesPattern(path string) bool {
 	return d.Inclusive && d.Regex.MatchString(path) ||
 		!d.Inclusive && !d.Regex.MatchString(path)
 }

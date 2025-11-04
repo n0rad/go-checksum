@@ -1,4 +1,5 @@
-//+build build
+//go:build build
+// +build build
 
 package main
 
@@ -8,12 +9,11 @@ import (
 
 func main() {
 	gomake.ProjectBuilder().
-		WithName("checksum").
+		WithName("filesum").
 		WithStep(&gomake.StepBuild{
 			Programs: []gomake.Program{
 				{
-					BinaryName: "checksum",
-					Package:    "github.com/n0rad/go-checksum/pkg/cli",
+					BinaryName: "filesum",
 				},
 			},
 		}).

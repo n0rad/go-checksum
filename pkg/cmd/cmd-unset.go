@@ -5,15 +5,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func RemoveCommand(config *Config) *cobra.Command {
+func UnsetCommand(config *Config) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "remove",
+		Use:   "unset",
 		Short: "Add integrity to filenames",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
-				if err := runCmdForPath(config, arg, func(d integrity.Directory) func(path string) error {
-					return d.Remove
+				if err := runCmdForPath(config, arg, func(d integrity.Path) func(path string) error {
+					return d.Unset
 				}); err != nil {
 					return err
 				}

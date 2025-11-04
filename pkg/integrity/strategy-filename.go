@@ -72,7 +72,7 @@ func (s StrategyFilename) Sum(file string) (string, error) {
 	return sum, nil
 }
 
-func (s StrategyFilename) Remove(file string) error {
+func (s StrategyFilename) Unset(file string) error {
 	return s.Set(file, "")
 }
 

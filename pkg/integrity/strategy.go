@@ -8,7 +8,7 @@ type Strategy interface {
 	Sum(file string) (string, error)       // TODO generic
 	SumAndSet(file string) (string, error) // TODO generic
 	Set(file string, sum string) error
-	Remove(file string) error
+	Unset(file string) error
 	Check(file string) (error, error) // TODO generic
 	IsSumFile(file string) bool
 }
