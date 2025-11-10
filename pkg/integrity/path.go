@@ -2,6 +2,7 @@ package integrity
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -30,7 +31,7 @@ func (d Path) List(path string) error {
 	})
 }
 
-func (d Path) Check(path string) error {
+func (d Path) Check(path string, output io.Writer) error {
 	return d.directoryWalk(path, func(path string, info os.FileInfo) {
 		set, err := d.Strategy.IsSet(path)
 		if err != nil {
@@ -38,6 +39,9 @@ func (d Path) Check(path string) error {
 			return
 		}
 		if !set {
+			if output != nil {
+				fmt.Fprintf(output, "missing %s\n", path)
+			}
 			logs.WithField("path", path).Warn("Missing sum")
 			return
 		}
@@ -45,9 +49,15 @@ func (d Path) Check(path string) error {
 		logs.WithField("path", path).Info("Processing file")
 		ok, err := d.Strategy.Check(path)
 		if err != nil {
-			logs.WithField("path", path).Error("Failed to check file integrity")
+			if output != nil {
+				fmt.Fprintf(output, "error %s\n", path)
+			}
+			logs.WithE(err).WithField("path", path).Error("Failed to check file integrity")
 		}
 		if ok != nil {
+			if output != nil {
+				fmt.Fprintf(output, "failed %s\n", path)
+			}
 			logs.WithE(ok).WithField("path", path).Error("File integrity failed")
 		}
 	})

@@ -5,3 +5,11 @@ patternIsExclusive: true
 #  hash: sha1
 strategy: sumfile
 #strategy: filename
+
+paths:
+  -
+
+
+server:
+  interval: 1w
+  scrubWindow:

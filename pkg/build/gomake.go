@@ -9,16 +9,16 @@ import (
 
 func main() {
 	gomake.ProjectBuilder().
-		WithName("filesum").
+		WithName("fim").
 		WithStep(&gomake.StepBuild{
 			Programs: []gomake.Program{
 				{
-					BinaryName: "filesum",
+					BinaryName: "fim",
 				},
 			},
 		}).
 		WithStep(&gomake.StepRelease{
-			OsArchRelease: []string{"linux-amd64", "darwin-amd64"},
+			OsArchRelease: []string{"linux-amd64", "darwin-amd64", "darwin-arm64", "linux-arm64"},
 		}).
 		MustBuild().MustExecute()
 }

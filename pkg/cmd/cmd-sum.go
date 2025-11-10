@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/n0rad/go-checksum/pkg/checksum"
+	"github.com/n0rad/file-integrity-manager/pkg/checksum"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +13,7 @@ func SumCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "sum",
-		Short: "Sum file",
+		Short: "Sum file like 'sha*sum' binaries",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			h := checksum.MakeHashString(hash)

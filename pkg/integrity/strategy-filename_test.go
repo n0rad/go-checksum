@@ -1,7 +1,7 @@
 package integrity
 
 import (
-	"github.com/n0rad/go-checksum/pkg/checksum"
+	"github.com/n0rad/file-integrity-manager/pkg/checksum"
 )
 
 var c = checksum.NewHash(checksum.Crc32_ieee)

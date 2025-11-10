@@ -2,13 +2,14 @@ package integrity
 
 import (
 	"encoding/hex"
-	"github.com/n0rad/go-checksum/pkg/checksum"
-	"github.com/n0rad/go-erlog/data"
-	"github.com/n0rad/go-erlog/errs"
 	"hash"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/n0rad/file-integrity-manager/pkg/checksum"
+	"github.com/n0rad/go-erlog/data"
+	"github.com/n0rad/go-erlog/errs"
 )
 
 type StrategyFilename struct {

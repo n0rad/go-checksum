@@ -1,6 +1,6 @@
 package integrity
 
-import "github.com/n0rad/go-checksum/pkg/checksum"
+import "github.com/n0rad/file-integrity-manager/pkg/checksum"
 
 type Strategy interface {
 	IsSet(file string) (bool, error)

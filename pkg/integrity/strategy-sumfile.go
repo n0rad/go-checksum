@@ -1,13 +1,14 @@
 package integrity
 
 import (
-	"github.com/n0rad/go-checksum/pkg/checksum"
-	"github.com/n0rad/go-erlog/data"
-	"github.com/n0rad/go-erlog/errs"
 	"hash"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/n0rad/file-integrity-manager/pkg/checksum"
+	"github.com/n0rad/go-erlog/data"
+	"github.com/n0rad/go-erlog/errs"
 )
 
 type StrategySumFile struct {
