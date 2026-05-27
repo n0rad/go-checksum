@@ -17,6 +17,10 @@ type StrategyFilename struct {
 	OldHash hash.Hash
 }
 
+func (s StrategyFilename) GetOriginalFilePath(file string) string {
+	return s.newFilename(file, "")
+}
+
 func (s StrategyFilename) IsSumFile(file string) bool {
 	return false
 }

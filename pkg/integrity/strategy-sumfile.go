@@ -16,6 +16,11 @@ type StrategySumFile struct {
 	HashName string
 }
 
+// TODO this is weird
+func (s StrategySumFile) GetOriginalFilePath(file string) string {
+	return file
+}
+
 func (s StrategySumFile) IsSumFile(file string) bool {
 	if filepath.Ext(file) == s.sumFileSuffix() {
 		return true

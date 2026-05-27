@@ -13,9 +13,7 @@ import (
 var Version = "0.0.0"
 
 func main() {
-	if err := fim.FIM.SetVersion(Version); err != nil {
-		logs.WithE(err).Fatal("Failed to set internal build version")
-	}
+	fim.FIM.Version = Version
 
 	if err := syscall.Setpriority(syscall.PRIO_PROCESS, syscall.Getpid(), 19); err != nil {
 		logs.WithE(err).Warn("Failed to set process priority")

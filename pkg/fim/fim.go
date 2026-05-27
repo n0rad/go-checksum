@@ -17,7 +17,7 @@ func init() {
 }
 
 type Fim struct {
-	app.App
+	app.CommonApp
 
 	Pattern            string
 	PatternIsInclusive bool
@@ -33,8 +33,8 @@ type Fim struct {
 	}
 }
 
-func (f *Fim) Init() error {
-	if err := f.App.Init(); err != nil {
+func (f *Fim) Init(home string) error {
+	if err := f.CommonApp.Init(home); err != nil {
 		return err
 	}
 
@@ -48,7 +48,9 @@ func (f *Fim) Init() error {
 	}
 
 	if f.Hash == "" {
-		f.Hash = checksum.Sha256
+		// TODO
+		//f.Hash = checksum.Sha256
+		f.Hash = checksum.Crc32_ieee
 	}
 
 	var err error

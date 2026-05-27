@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -83,6 +84,44 @@ func (d Path) Set(path string) error {
 			}
 		} else {
 			logs.WithField("path", path).Debug("Sum already exists")
+		}
+	})
+}
+func (d Path) Overlay(rootPath string, target string) error {
+	return d.directoryWalk(rootPath, func(path string, info os.FileInfo) {
+		relativeFolder := strings.TrimLeft(filepath.Dir(path), rootPath)
+		oldName, err := filepath.Rel(filepath.Join(target, relativeFolder), path)
+		if err != nil {
+			logs.WithE(err).Error("Failed to determine relative root path")
+			return
+		}
+		filename := filepath.Base(d.Strategy.GetOriginalFilePath(path))
+		newName := filepath.Join(target, relativeFolder, filename)
+
+		if err := os.MkdirAll(filepath.Dir(newName), 0755); err != nil {
+			logs.WithE(err).Error("Failed to create target directory")
+			return
+		}
+		if stat, err := os.Lstat(newName); err == nil && stat.Mode()&os.ModeSymlink != 0 {
+			targetFile, err := filepath.EvalSymlinks(newName)
+			if err != nil {
+				logs.WithE(err).WithField("link", newName).Info("Already existing wrong symlink target")
+			}
+			if targetFile != path || err != nil {
+				logs.WithField("newName", newName).WithField("oldName", path).WithField("existing", targetFile).Warn("Link already exists with different target, recreating")
+				if err := os.Remove(newName); err != nil {
+					logs.WithE(err).Error("Failed to remove existing symlink in target directory")
+				}
+				if err := os.Symlink(oldName, newName); err != nil {
+					logs.WithE(err).Error("Failed to create symlink in target directory")
+					return
+				}
+			}
+		} else {
+			if err := os.Symlink(oldName, newName); err != nil {
+				logs.WithE(err).Error("Failed to create symlink in target directory")
+				return
+			}
 		}
 	})
 }

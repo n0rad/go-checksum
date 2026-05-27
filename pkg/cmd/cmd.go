@@ -10,26 +10,24 @@ import (
 )
 
 func RootCmd() *cobra.Command {
-	var homePath string
 	var logLevel string
+	var home string
 
 	cmd := &cobra.Command{
 		Use:           os.Args[0],
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			fim.FIM.Home = homePath
-
-			if err := fim.FIM.Init(); err != nil {
-				return err
+			if logLevel != "" {
+				if level, err := logs.ParseLevel(logLevel); err != nil {
+					logs.WithField("value", logLevel).Fatal("Unknown log level")
+				} else {
+					logs.SetLevel(level)
+				}
 			}
 
-			if logLevel != "" {
-				level, err := logs.ParseLevel(logLevel)
-				if err != nil {
-					logs.WithField("value", logLevel).Fatal("Unknown log level")
-				}
-				logs.SetLevel(level)
+			if err := fim.FIM.Init(home); err != nil {
+				return err
 			}
 
 			if cmd.Use == "sum" {
@@ -47,10 +45,11 @@ func RootCmd() *cobra.Command {
 		SetCommand(),
 		ServerCommand(),
 		SumCommand(),
+		OverlayCommand(),
 	)
 
 	cmd.PersistentFlags().StringVarP(&logLevel, "log-level", "L", "", "Set log level")
-	cmd.PersistentFlags().StringVarP(&homePath, "home", "H", fim.FIM.DefaultHomeFolder(), "fim home directory")
+	cmd.PersistentFlags().StringVarP(&home, "home", "H", fim.FIM.DefaultHomeFolder(), "fim home directory")
 
 	return cmd
 }

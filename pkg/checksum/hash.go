@@ -5,17 +5,18 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"hash"
+	"hash/adler32"
+	"hash/crc32"
+	"hash/crc64"
+	"hash/fnv"
+
 	"github.com/n0rad/file-integrity-manager/pkg/hashs"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/blake2s"
 	"golang.org/x/crypto/md4"
 	"golang.org/x/crypto/ripemd160"
 	"golang.org/x/crypto/sha3"
-	"hash"
-	"hash/adler32"
-	"hash/crc32"
-	"hash/crc64"
-	"hash/fnv"
 )
 
 func MakeHashString(hashName string) hash.Hash {
