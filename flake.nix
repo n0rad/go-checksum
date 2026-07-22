@@ -26,17 +26,27 @@
 
             vendorHash = "sha256-G77lbbKp1zfgcOP9CHqPA0kuh2jdXoVfAe+oEQjsmQc=";
 
-            subPackages = [ "." ];
+            nativeBuildInputs = [ pkgs.git ];
 
-            ldflags = [
-              "-s"
-              "-w"
-              "-X main.Version=0.0.0"
-            ];
-
-            postInstall = ''
-              mv $out/bin/file-integrity-manager $out/bin/fim
+            buildPhase = ''
+              runHook preBuild
+              export HOME=$TMPDIR
+              git init -q
+              git config user.email "nix@localhost"
+              git config user.name "nix"
+              git add -A
+              git commit -q -m "nix build"
+              ./gomake build -L debug
+              runHook postBuild
             '';
+
+            installPhase = ''
+              runHook preInstall
+              install -Dm755 dist/fim-*/fim $out/bin/fim
+              runHook postInstall
+            '';
+
+            doCheck = false;
 
             meta = {
               description = "Library, tool and server to manage files integrity";
