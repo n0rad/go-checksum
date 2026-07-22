@@ -12,12 +12,8 @@ import (
 
 var FIM Fim
 
-func init() {
-	FIM.Name = "fim"
-}
-
 type Fim struct {
-	app.CommonApp
+	app.App
 
 	Pattern            string
 	PatternIsInclusive bool
@@ -34,7 +30,8 @@ type Fim struct {
 }
 
 func (f *Fim) Init(home string) error {
-	if err := f.CommonApp.Init(home); err != nil {
+	f.App.Name = "fim"
+	if err := f.App.Init(f); err != nil {
 		return err
 	}
 

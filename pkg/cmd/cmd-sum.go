@@ -30,7 +30,7 @@ func SumCommand() *cobra.Command {
 				}
 				fmt.Print(fileSum)
 			} else {
-				for i := 0; i < len(args); i++ {
+				for i := range args {
 					stat, err := os.Stat(args[i])
 					if err != nil {
 						println(os.Args[0], ": ", args[i], ": ", "No such file or directory")

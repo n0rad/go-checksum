@@ -8,7 +8,7 @@ func (Crc8) BlockSize() int { return 1 }
 
 func (c Crc8) calc(b byte) Crc8 {
 	d := c ^ Crc8(b)
-	for i := 0; i < 8; i++ {
+	for range 8 {
 		if d&0x80 != 0 {
 			d <<= 1
 			d ^= 0x07

@@ -49,7 +49,7 @@ func RootCmd() *cobra.Command {
 	)
 
 	cmd.PersistentFlags().StringVarP(&logLevel, "log-level", "L", "", "Set log level")
-	cmd.PersistentFlags().StringVarP(&home, "home", "H", fim.FIM.DefaultHomeFolder(), "fim home directory")
+	cmd.PersistentFlags().StringVarP(&home, "home", "H", fim.FIM.DefaultConfigFolder(), "fim home directory")
 
 	return cmd
 }
