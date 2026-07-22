@@ -4,18 +4,20 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
+	sha30 "crypto/sha3"
 	"crypto/sha512"
-	"github.com/n0rad/go-checksum/pkg/hashs"
-	"golang.org/x/crypto/blake2b"
-	"golang.org/x/crypto/blake2s"
-	"golang.org/x/crypto/md4"
-	"golang.org/x/crypto/ripemd160"
-	"golang.org/x/crypto/sha3"
 	"hash"
+	hash0 "hash"
 	"hash/adler32"
 	"hash/crc32"
 	"hash/crc64"
 	"hash/fnv"
+
+	"github.com/n0rad/file-integrity-manager/pkg/hashs"
+	"golang.org/x/crypto/blake2b"
+	"golang.org/x/crypto/blake2s"
+	"golang.org/x/crypto/md4"
+	"golang.org/x/crypto/ripemd160"
 )
 
 func MakeHashString(hashName string) hash.Hash {
@@ -49,13 +51,17 @@ func NewHash(hash Hash) hash.Hash {
 	case "sha384":
 		return sha512.New384()
 	case "sha3-224":
-		return sha3.New224()
+		return hash0.
+			Hash(sha30.New224())
 	case "sha3-256":
-		return sha3.New256()
+		return hash0.
+			Hash(sha30.New256())
 	case "sha3-384":
-		return sha3.New384()
+		return hash0.
+			Hash(sha30.New384())
 	case "sha3-512":
-		return sha3.New512()
+		return hash0.
+			Hash(sha30.New512())
 	case "sha512":
 		return sha512.New()
 	case "sha512-224":

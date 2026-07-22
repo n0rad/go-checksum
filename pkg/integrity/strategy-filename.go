@@ -2,18 +2,23 @@ package integrity
 
 import (
 	"encoding/hex"
-	"github.com/n0rad/go-checksum/pkg/checksum"
-	"github.com/n0rad/go-erlog/data"
-	"github.com/n0rad/go-erlog/errs"
 	"hash"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/n0rad/file-integrity-manager/pkg/checksum"
+	"github.com/n0rad/go-erlog/data"
+	"github.com/n0rad/go-erlog/errs"
 )
 
 type StrategyFilename struct {
 	Hash    hash.Hash
 	OldHash hash.Hash
+}
+
+func (s StrategyFilename) GetOriginalFilePath(file string) string {
+	return s.newFilename(file, "")
 }
 
 func (s StrategyFilename) IsSumFile(file string) bool {
@@ -72,7 +77,7 @@ func (s StrategyFilename) Sum(file string) (string, error) {
 	return sum, nil
 }
 
-func (s StrategyFilename) Remove(file string) error {
+func (s StrategyFilename) Unset(file string) error {
 	return s.Set(file, "")
 }
 

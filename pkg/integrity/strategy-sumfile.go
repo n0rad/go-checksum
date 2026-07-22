@@ -1,18 +1,24 @@
 package integrity
 
 import (
-	"github.com/n0rad/go-checksum/pkg/checksum"
-	"github.com/n0rad/go-erlog/data"
-	"github.com/n0rad/go-erlog/errs"
 	"hash"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/n0rad/file-integrity-manager/pkg/checksum"
+	"github.com/n0rad/go-erlog/data"
+	"github.com/n0rad/go-erlog/errs"
 )
 
 type StrategySumFile struct {
 	Hash     hash.Hash
 	HashName string
+}
+
+// TODO this is weird
+func (s StrategySumFile) GetOriginalFilePath(file string) string {
+	return file
 }
 
 func (s StrategySumFile) IsSumFile(file string) bool {
@@ -80,7 +86,7 @@ func (s StrategySumFile) Set(file string, sum string) error {
 	return nil
 }
 
-func (s StrategySumFile) Remove(file string) error {
+func (s StrategySumFile) Unset(file string) error {
 	sumFilename := s.sumFilename(file)
 	if _, err := os.Stat(sumFilename); err == nil {
 		if err := os.Remove(sumFilename); err != nil {

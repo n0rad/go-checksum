@@ -1,6 +1,6 @@
-# File Integrity Manager
+# Go checksum
 
-library, tool and server to manage files integrity
+Command line and library to manage files integrity checksums
 
 As lib :
 - Support plenty of algorithms 
@@ -31,7 +31,7 @@ strategy: sumfile        # `sumfile` or `filename` store sum to a sumefile and d
 
 ```bash
 # work like `sha1sum`
-fim sum -H sha1 testfile.txt
+fi sum -H sha1 testfile.txt
 
 
 # list files that will be hashed and checked

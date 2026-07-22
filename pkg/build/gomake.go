@@ -1,4 +1,5 @@
-//+build build
+//go:build build
+// +build build
 
 package main
 
@@ -8,17 +9,16 @@ import (
 
 func main() {
 	gomake.ProjectBuilder().
-		WithName("checksum").
+		WithName("fim").
 		WithStep(&gomake.StepBuild{
 			Programs: []gomake.Program{
 				{
-					BinaryName: "checksum",
-					Package:    "github.com/n0rad/go-checksum/pkg/cli",
+					BinaryName: "fim",
 				},
 			},
 		}).
 		WithStep(&gomake.StepRelease{
-			OsArchRelease: []string{"linux-amd64", "darwin-amd64"},
+			OsArchRelease: []string{"linux-amd64", "darwin-amd64", "darwin-arm64", "linux-arm64"},
 		}).
 		MustBuild().MustExecute()
 }
