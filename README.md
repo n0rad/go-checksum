@@ -35,15 +35,15 @@ fim sum -H sha1 testfile.txt
 
 
 # list files that will be hashed and checked
-fi -c ./checksum.yaml list test/
+fim -c ./checksum.yaml list test/
 # set sum to filesum or filename
-fi set test/
+fim set test/
 # watch for new files in the tree and set sum
-fi set watch test/
+fim set watch test/
 # remove filesum or sum from filename
-fi remove test/
+fim remove test/
 # check that sum matches file
-fi check test/
+fim check test/
 ```
 
 Supported algorithms : Blake2b-256, Blake2b-384, Blake2b-512, Blake2s-256, Ripemd160, Md4, Md5, Sha1, Sha256, Sha384, Sha3-224, Sha3-256, Sha3-384, Sha3-512, Sha512, Sha512-224, Sha512-256, Crc32-ieee, Crc64-iso, Crc64-ecma, Adler32, Fnv32, Fnv32a, Fnv64, Fnv64a, Fnv128, Fnv128a, Xor8, Fletch16, Luhn, Sum16, Sum32, Sum64, Crc8, Crc16-ccitt,
