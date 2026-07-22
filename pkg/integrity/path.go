@@ -88,7 +88,7 @@ func (d Path) Set(path string) error {
 	})
 }
 func (d Path) Overlay(rootPath string, target string) error {
-	return d.directoryWalk(rootPath, func(path string, info os.FileInfo) {
+	if err := d.directoryWalk(rootPath, func(path string, info os.FileInfo) {
 		relativeFolder := strings.TrimLeft(filepath.Dir(path), rootPath)
 		oldName, err := filepath.Rel(filepath.Join(target, relativeFolder), path)
 		if err != nil {
@@ -123,6 +123,34 @@ func (d Path) Overlay(rootPath string, target string) error {
 				return
 			}
 		}
+	}); err != nil {
+		return err
+	}
+	return d.cleanupOverlay(target)
+}
+
+// cleanupOverlay walks the target directory and removes any symlink whose
+// target no longer exists, meaning the original file was removed or renamed.
+func (d Path) cleanupOverlay(target string) error {
+	return filepath.Walk(target, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			logs.WithE(err).WithField("path", path).Error("Failed to process path")
+			return nil
+		}
+		if info.Mode()&os.ModeSymlink == 0 {
+			return nil
+		}
+		if _, err := os.Stat(path); err != nil {
+			if os.IsNotExist(err) {
+				logs.WithField("path", path).Warn("Removing dangling symlink")
+				if err := os.Remove(path); err != nil {
+					logs.WithE(err).WithField("path", path).Error("Failed to remove dangling symlink")
+				}
+			} else {
+				logs.WithE(err).WithField("path", path).Error("Failed to stat symlink target")
+			}
+		}
+		return nil
 	})
 }
 
