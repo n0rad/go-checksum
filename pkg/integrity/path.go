@@ -94,7 +94,7 @@ func (d Path) Set(path string) error {
 }
 func (d Path) Overlay(rootPath string, target string) error {
 	if err := d.directoryWalk(rootPath, func(path string, info os.FileInfo) {
-		relativeFolder := d.stripRelativeFolder(strings.TrimLeft(filepath.Dir(path), rootPath))
+		relativeFolder := d.stripRelativeFolder(strings.TrimPrefix(filepath.Dir(path), rootPath))
 		oldName, err := filepath.Rel(filepath.Join(target, relativeFolder), path)
 		if err != nil {
 			logs.WithE(err).Error("Failed to determine relative root path")
