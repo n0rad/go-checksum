@@ -20,6 +20,11 @@ type Path struct {
 	Inclusive bool
 	Strategy  Strategy
 
+	// StripDepth, when > 0, is the number of top-level parent folders to
+	// strip away from the overlay target, keeping only the deeper folders
+	// closer to each file.
+	StripDepth int
+
 	timers      map[string]*time.Timer
 	timersMutex *sync.Mutex
 }
@@ -89,7 +94,7 @@ func (d Path) Set(path string) error {
 }
 func (d Path) Overlay(rootPath string, target string) error {
 	if err := d.directoryWalk(rootPath, func(path string, info os.FileInfo) {
-		relativeFolder := strings.TrimLeft(filepath.Dir(path), rootPath)
+		relativeFolder := d.stripRelativeFolder(strings.TrimLeft(filepath.Dir(path), rootPath))
 		oldName, err := filepath.Rel(filepath.Join(target, relativeFolder), path)
 		if err != nil {
 			logs.WithE(err).Error("Failed to determine relative root path")
@@ -127,6 +132,27 @@ func (d Path) Overlay(rootPath string, target string) error {
 		return err
 	}
 	return d.cleanupOverlay(target)
+}
+
+// stripRelativeFolder strips away the first StripDepth path segments of
+// relativeFolder (the top-level parent folders), keeping only the deeper
+// folders in the overlay target.
+func (d Path) stripRelativeFolder(relativeFolder string) string {
+	if d.StripDepth <= 0 {
+		return relativeFolder
+	}
+
+	trimmed := strings.Trim(relativeFolder, string(filepath.Separator))
+	if trimmed == "" || trimmed == "." {
+		return relativeFolder
+	}
+
+	parts := strings.Split(trimmed, string(filepath.Separator))
+	if d.StripDepth >= len(parts) {
+		return ""
+	}
+	parts = parts[d.StripDepth:]
+	return filepath.Join(parts...)
 }
 
 // cleanupOverlay walks the target directory and removes any symlink whose
