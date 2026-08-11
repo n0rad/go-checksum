@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/becloudless/go-app"
 	"github.com/n0rad/file-integrity-manager/pkg/checksum"
-	"github.com/n0rad/go-app"
 	"github.com/n0rad/go-erlog/data"
 	"github.com/n0rad/go-erlog/errs"
 )
